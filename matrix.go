@@ -1,6 +1,9 @@
 package gg
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 type Matrix struct {
 	XX, YX, XY, YY, X0, Y0 float64
@@ -85,4 +88,28 @@ func (a Matrix) Rotate(angle float64) Matrix {
 
 func (a Matrix) Shear(x, y float64) Matrix {
 	return Shear(x, y).Multiply(a)
+}
+
+func (a Matrix) Determinant() float64 {
+	return a.XX*a.YY - a.XY*a.YX
+}
+
+func (a Matrix) Inverse() (Matrix, error) {
+	det := a.Determinant()
+	if det == 0 {
+		return Matrix{}, fmt.Errorf("can't invert matrix: %v", a)
+	}
+
+	xx := a.YY / det
+	yx := -a.YX / det
+	xy := -a.XY / det
+	yy := a.XX / det
+	x0 := (a.XY*a.Y0 - a.X0*a.YY) / det
+	y0 := (-a.XX*a.Y0 + a.YX*a.X0) / det
+
+	return Matrix{
+		xx, yx,
+		xy, yy,
+		x0, y0,
+	}, nil
 }
