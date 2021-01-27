@@ -110,6 +110,11 @@ type GraphicContext interface {
 	// returning a transformed position.
 	TransformPoint(x, y float64) (float64, float64)
 
+	// GetMatrix returns the Transformation Matrix
+	GetMatrix() Matrix
+	// SetMatrix sets the current transformation matrix
+	SetMatrix(m Matrix)
+
 	// Push saves the current state of the context for later retrieval. These
 	// can be nested.
 	Push()

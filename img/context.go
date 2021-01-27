@@ -466,6 +466,21 @@ func (dc *Context) Rotate(angle float64) {
 	dc.matrix = dc.matrix.Rotate(angle)
 }
 
+// GetMatrix returns the Transformation Matrix
+func (dc *Context) GetMatrix() gg.Matrix {
+	return dc.matrix
+}
+
+// SetMatrix sets the current transformation matrix
+func (dc *Context) SetMatrix(m gg.Matrix) {
+	dc.matrix.XX = m.XX
+	dc.matrix.YX = m.YX
+	dc.matrix.XY = m.XY
+	dc.matrix.YY = m.YY
+	dc.matrix.X0 = m.X0
+	dc.matrix.Y0 = m.Y0
+}
+
 // TransformPoint multiplies the specified point by the current matrix,
 // returning a transformed position.
 func (dc *Context) TransformPoint(x, y float64) (tx, ty float64) {
