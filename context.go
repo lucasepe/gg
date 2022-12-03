@@ -701,6 +701,7 @@ func (dc *Context) DrawQuad(x1, y1, x2, y2, x3, y3, x4, y4 float64) {
 	dc.ClosePath()
 }
 
+/*
 func (dc *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 	x0, x1, x2, x3 := x, x+r, x+w-r, x+w
 	y0, y1, y2, y3 := y, y+r, y+h-r, y+h
@@ -714,6 +715,48 @@ func (dc *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 	dc.DrawEllipticalArc(x1, y2, r, r, Radians(90), Radians(180))
 	dc.LineTo(x0, y1)
 	dc.DrawEllipticalArc(x1, y1, r, r, Radians(180), Radians(270))
+	dc.ClosePath()
+}
+*/
+
+func (dc *Context) DrawRoundedRectangle(x, y, w, h, tl, tr, br, bl float64) {
+	// corner rounding must always be positive
+	absW, absH := math.Abs(w), math.Abs(h)
+	hw, hh := absW/2, absH/2
+
+	// Clip radii
+	if absW < 2*tl {
+		tl = hw
+	}
+	if absH < 2*tl {
+		tl = hh
+	}
+	if absW < 2*tr {
+		tr = hw
+	}
+	if absH < 2*tr {
+		tr = hh
+	}
+	if absW < 2*br {
+		br = hw
+	}
+	if absH < 2*br {
+		br = hh
+	}
+	if absW < 2*bl {
+		bl = hw
+	}
+	if absH < 2*bl {
+		bl = hh
+	}
+
+	// Draw shape
+	dc.NewSubPath()
+	dc.MoveTo(x+tl, y)
+	dc.ArcTo(x+w, y, x+w, y+h, tr)
+	dc.ArcTo(x+w, y+h, x, y+h, br)
+	dc.ArcTo(x, y+h, x, y, bl)
+	dc.ArcTo(x, y, x+w, y, tl)
 	dc.ClosePath()
 }
 
