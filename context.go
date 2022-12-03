@@ -592,6 +592,18 @@ func (dc *Context) DrawRectangle(x, y, w, h float64) {
 	dc.ClosePath()
 }
 
+// DrawQuad draws a quadrilateral, a four sided polygon.
+// It is similar to a rectangle, but the angles between its edges
+// are not constrained to ninety degrees.
+func (dc *Context) DrawQuad(x1, y1, x2, y2, x3, y3, x4, y4 float64) {
+	dc.NewSubPath()
+	dc.MoveTo(x1, y1)
+	dc.LineTo(x2, y2)
+	dc.LineTo(x3, y3)
+	dc.LineTo(x4, y4)
+	dc.ClosePath()
+}
+
 func (dc *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 	x0, x1, x2, x3 := x, x+r, x+w-r, x+w
 	y0, y1, y2, y3 := y, y+r, y+h-r, y+h
