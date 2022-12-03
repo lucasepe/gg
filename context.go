@@ -358,6 +358,103 @@ func (dc *Context) CubicTo(x1, y1, x2, y2, x3, y3 float64) {
 	}
 }
 
+// ArcTo adds a circular arc to the current sub-path, using
+// the given control points and radius.
+// The arc is automatically connected to the path's latest
+// point with a straight line, if necessary for the specified parameters.
+//
+// This method is commonly used for making rounded corners.
+// https://github.com/WebKit/webkit/blob/main/Source/WebCore/platform/graphics/cairo/PathCairo.cpp#L204
+func (dc *Context) ArcTo(x1, y1, x2, y2, radius float64) {
+	if !dc.hasCurrent {
+		dc.MoveTo(x1, y1)
+	}
+
+	// Get current point
+	x0, y0 := dc.current.X, dc.current.Y
+
+	// Draw only a straight line to p1 if any of the points are equal or the radius is zero
+	// or the points are collinear (triangle that the points form has area of zero value).
+	if (x1 == x0 && y1 == y0) || (x1 == x2 && y1 == y2) || (radius == 0) {
+		dc.LineTo(x1, y1)
+		return
+	}
+
+	p1p0 := Point{X: x0 - x1, Y: y0 - y1}
+	p1p2 := Point{X: x2 - x1, Y: y2 - y1}
+
+	p1p0Length := math.Hypot(p1p0.X, p1p0.Y)
+	p1p2Length := math.Hypot(p1p2.X, p1p2.Y)
+
+	cosPhi := (p1p0.X*p1p2.X + p1p0.Y*p1p2.Y) / (p1p0Length * p1p2Length)
+	// all points on a line logic
+	if cosPhi == -1 {
+		dc.LineTo(x1, y1)
+		return
+	}
+
+	if cosPhi == 1 {
+		// add infinite far away point
+		maxLength := 65535.0
+		factorMax := maxLength / p1p0Length
+		ep := Point{
+			X: x0 + factorMax*p1p0.X,
+			Y: y0 + factorMax*p1p0.Y,
+		}
+		dc.LineTo(ep.X, ep.Y)
+		return
+	}
+
+	tangent := radius / math.Tan(math.Acos(cosPhi)/2)
+	factorP1P0 := tangent / p1p0Length
+	tP1P0 := Point{
+		X: x1 + factorP1P0*p1p0.X,
+		Y: y1 + factorP1P0*p1p0.Y,
+	}
+
+	orthP1P0 := Point{X: p1p0.Y, Y: -p1p0.X}
+	orthP1P0Length := math.Hypot(orthP1P0.X, orthP1P0.Y)
+	factorRa := radius / orthP1P0Length
+
+	// angle between orth_p1p0 and p1p2 to get the right vector orthographic to p1p0
+	cosAlpha := (orthP1P0.X*p1p2.X + orthP1P0.Y*p1p2.Y) / (orthP1P0Length * p1p2Length)
+	if cosAlpha < 0 {
+		orthP1P0 = Point{X: -orthP1P0.X, Y: -orthP1P0.Y}
+	}
+
+	p := Point{
+		X: tP1P0.X + factorRa*orthP1P0.X,
+		Y: tP1P0.Y + factorRa*orthP1P0.Y,
+	}
+
+	// calculate angles for addArc
+	orthP1P0 = Point{X: -orthP1P0.X, Y: -orthP1P0.Y}
+	sa := math.Acos(orthP1P0.X / orthP1P0Length)
+	if orthP1P0.Y < 0 {
+		sa = 2*math.Pi - sa
+	}
+
+	factorP1P2 := tangent / p1p2Length
+	tP1P2 := Point{
+		X: x1 + factorP1P2*p1p2.X,
+		Y: y1 + factorP1P2*p1p2.Y,
+	}
+
+	orthP1P2 := Point{
+		X: tP1P2.X - p.X,
+		Y: tP1P2.Y - p.Y,
+	}
+	orthP1P2Length := math.Hypot(orthP1P2.X, orthP1P2.Y)
+
+	ea := math.Acos(orthP1P2.X / orthP1P2Length)
+	if orthP1P2.Y <= 0 {
+		ea = 2*math.Pi - ea
+	}
+
+	dc.LineTo(tP1P0.X, tP1P0.Y)
+	dc.DrawEllipticalArc(p.X, p.Y, radius, radius, sa, ea)
+}
+
 // ClosePath adds a line segment from the current point to the beginning
 // of the current subpath. If there is no current point, this is a no-op.
 func (dc *Context) ClosePath() {
@@ -610,13 +707,13 @@ func (dc *Context) DrawRoundedRectangle(x, y, w, h, r float64) {
 	dc.NewSubPath()
 	dc.MoveTo(x1, y0)
 	dc.LineTo(x2, y0)
-	dc.DrawArc(x2, y1, r, Radians(270), Radians(360))
+	dc.DrawEllipticalArc(x2, y1, r, r, Radians(270), Radians(360))
 	dc.LineTo(x3, y2)
-	dc.DrawArc(x2, y2, r, Radians(0), Radians(90))
+	dc.DrawEllipticalArc(x2, y2, r, r, Radians(0), Radians(90))
 	dc.LineTo(x1, y3)
-	dc.DrawArc(x1, y2, r, Radians(90), Radians(180))
+	dc.DrawEllipticalArc(x1, y2, r, r, Radians(90), Radians(180))
 	dc.LineTo(x0, y1)
-	dc.DrawArc(x1, y1, r, Radians(180), Radians(270))
+	dc.DrawEllipticalArc(x1, y1, r, r, Radians(180), Radians(270))
 	dc.ClosePath()
 }
 
@@ -650,10 +747,6 @@ func (dc *Context) DrawEllipse(x, y, rx, ry float64) {
 	dc.NewSubPath()
 	dc.DrawEllipticalArc(x, y, rx, ry, 0, 2*math.Pi)
 	dc.ClosePath()
-}
-
-func (dc *Context) DrawArc(x, y, r, angle1, angle2 float64) {
-	dc.DrawEllipticalArc(x, y, r, r, angle1, angle2)
 }
 
 func (dc *Context) DrawCircle(x, y, r float64) {
