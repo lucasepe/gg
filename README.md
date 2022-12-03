@@ -6,7 +6,7 @@
 
 `gg` is a library for rendering 2D graphics in pure Go.
 
-`github.com/lucasepe/gg` is a fork of [github.com/fogleman/gg](https://github.com/fogleman/gg).
+`github.com/lucasepe/gg` is a modified fork of [github.com/fogleman/gg](https://github.com/fogleman/gg).
 
 ![Stars](http://i.imgur.com/CylQIJt.png)
 
