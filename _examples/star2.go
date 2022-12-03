@@ -26,21 +26,21 @@ func Polygon(n int, x, y, r float64) []Point {
 }
 
 func main() {
-	spikes := 7
-	cx, cy := 200.0, 200.0
-	or, ir := 150.0, 80.0
-
-	dc := gg.NewContext(400, 400)
+	n := 5
+	points := Polygon(n, 512, 512, 400)
+	dc := gg.NewContext(1024, 1024)
 	dc.SetHexColor("fff")
 	dc.Clear()
-
-	dc.DrawStar(cx, cy, spikes, or, ir)
-
+	for i := 0; i < n+1; i++ {
+		index := (i * 2) % n
+		p := points[index]
+		dc.LineTo(p.X, p.Y)
+	}
 	dc.SetRGBA(0, 0.5, 0, 1)
 	dc.SetFillRule(gg.FillRuleEvenOdd)
 	dc.FillPreserve()
 	dc.SetRGBA(0, 1, 0, 0.5)
 	dc.SetLineWidth(16)
 	dc.Stroke()
-	dc.SavePNG("star.png")
+	dc.SavePNG("star2.png")
 }

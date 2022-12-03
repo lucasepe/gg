@@ -676,6 +676,27 @@ func (dc *Context) DrawRegularPolygon(n int, x, y, r, rotation float64) {
 	dc.ClosePath()
 }
 
+func (dc *Context) DrawStar(cx, cy float64, spikes int, outerRadius, innerRadius float64) {
+	rot := math.Pi / 2.0 * 3
+	step := math.Pi / float64(spikes)
+
+	dc.NewSubPath()
+	dc.MoveTo(cx, cy-outerRadius)
+	for i := 0; i < spikes; i++ {
+		x := cx + math.Cos(rot)*outerRadius
+		y := cy + math.Sin(rot)*outerRadius
+		dc.LineTo(x, y)
+		rot = rot + step
+
+		x = cx + math.Cos(rot)*innerRadius
+		y = cy + math.Sin(rot)*innerRadius
+		dc.LineTo(x, y)
+		rot = rot + step
+	}
+	dc.LineTo(cx, cy-outerRadius)
+	dc.ClosePath()
+}
+
 // DrawImage draws the specified image at the specified point.
 func (dc *Context) DrawImage(im image.Image, x, y int) {
 	dc.DrawImageAnchored(im, x, y, 0, 0)
