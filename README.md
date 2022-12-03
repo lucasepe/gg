@@ -76,6 +76,7 @@ SetPixel(x, y int)
 
 MoveTo(x, y float64)
 LineTo(x, y float64)
+ArcTo(x1, y1, x2, y2, radius float64)
 QuadraticTo(x1, y1, x2, y2 float64)
 CubicTo(x1, y1, x2, y2, x3, y3 float64)
 ClosePath()
