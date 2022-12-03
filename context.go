@@ -929,7 +929,7 @@ func (dc *Context) Push() {
 func (dc *Context) Pop() {
 	before := *dc
 	s := dc.stack
-	x, s := s[len(s)-1], s[:len(s)-1]
+	x, _ := s[len(s)-1], s[:len(s)-1]
 	*dc = *x
 	dc.mask = before.mask
 	dc.strokePath = before.strokePath

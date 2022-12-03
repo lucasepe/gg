@@ -145,6 +145,11 @@ NewSurfacePattern(im image.Image, op RepeatOp)
 ## Transformation Functions
 
 ```go
+GetMatrix() Matrix
+SetMatrix(m Matrix)
+```
+
+```go
 Identity()
 Translate(x, y float64)
 Scale(x, y float64)
