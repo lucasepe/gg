@@ -1,4 +1,8 @@
-package img
+// Copyright ©2022 The gg Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+package gg
 
 import (
 	"math"
@@ -146,7 +150,7 @@ func rasterPath(paths [][]Point) raster.Path {
 				if dy < 0 {
 					dy = -dy
 				}
-				if dx+dy > 8 {
+				if dx+dy > 4 {
 					// TODO: this is a hack for cases where two points are
 					// too close - causes rendering issues with joins / caps
 					result.Add1(f)

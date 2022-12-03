@@ -1,4 +1,8 @@
-package img
+// Copyright ©2022 The gg Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+package gg
 
 import "math"
 
@@ -12,7 +16,6 @@ func quadratic(x0, y0, x1, y1, x2, y2, t float64) (x, y float64) {
 	return
 }
 
-// QuadraticBezier returns points for a quadratic bezier curve
 func QuadraticBezier(x0, y0, x1, y1, x2, y2 float64) []Point {
 	l := (math.Hypot(x1-x0, y1-y0) +
 		math.Hypot(x2-x1, y2-y1))
@@ -41,7 +44,6 @@ func cubic(x0, y0, x1, y1, x2, y2, x3, y3, t float64) (x, y float64) {
 	return
 }
 
-// CubicBezier returns points for a cubic bezier curve
 func CubicBezier(x0, y0, x1, y1, x2, y2, x3, y3 float64) []Point {
 	l := (math.Hypot(x1-x0, y1-y0) +
 		math.Hypot(x2-x1, y2-y1) +

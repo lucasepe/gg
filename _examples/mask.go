@@ -1,0 +1,26 @@
+// Copyright ©2022 The gg Authors. All rights reserved.
+// Use of this source code is governed by a MIT-style
+// license that can be found in the LICENSE file.
+
+//go:build ignore
+
+package main
+
+import (
+	"log"
+
+	"github.com/lucasepe/gg"
+)
+
+func main() {
+	im, err := gg.LoadImage("examples/baboon.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dc := gg.NewContext(512, 512)
+	dc.DrawRoundedRectangle(0, 0, 512, 512, 64)
+	dc.Clip()
+	dc.DrawImage(im, 0, 0)
+	dc.SavePNG("out.png")
+}
