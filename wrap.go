@@ -9,7 +9,7 @@ import (
 	"unicode"
 )
 
-type measureStringer interface {
+type StringMeasurer interface {
 	MeasureString(s string) (w, h float64)
 }
 
@@ -29,7 +29,7 @@ func splitOnSpace(x string) []string {
 	return result
 }
 
-func wordWrap(m measureStringer, s string, width float64) []string {
+func WordWrap(m StringMeasurer, s string, width float64) []string {
 	var result []string
 	for _, line := range strings.Split(s, "\n") {
 		fields := splitOnSpace(line)
